@@ -1,0 +1,1987 @@
+/* =========================================================
+🌈 TEMA CENTRAL (cores principais e ajustes rápidos)
+========================================================= */
+
+:root {
+  /* === Cores de identidade === */
+  --brand-purple: #cc13ca; /* Cor primária - usada em títulos, detalhes */
+  --brand-pink: #a1728c; /* Cor secundária - botões, preços */
+
+  /* === Fundo e texto === */
+  --bg: #0f0f12; /* Fundo geral (fallback escuro) */
+  --card: rgba(0, 0, 0, 0.2); /* Fundo dos cards e sacola */
+  --stroke: rgba(0, 0, 0, 0.2); /* Bordas sutis */
+  --text: #ffffff; /* Cor do texto padrão */
+  --muted: #cfcfe3; /* Texto secundário */
+
+  /* === Tons complementares === */
+  --accent-yellow1: #cc13ca; /* Gradiente do botão flutuante */
+  --accent-yellow2: #cc13ca;
+}
+
+/* =========================================================
+🖼️ FUNDOS E TEXTURAS
+========================================================= */
+
+/* Corpo base */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* --- INICIO DA CORREÇÃO DO FUNDO --- */
+  background-color: #f5f6f6; /* Cor inicial (do Açaí) */
+  background-attachment: fixed;
+  transition: background-color 0.6s ease-in-out; /* Transição suave */
+  /* --- FIM DA CORREÇÃO --- */
+
+  color: var(--text);
+  overflow-x: hidden;
+  position: relative;
+  z-index: 0; /* contexto base */
+}
+
+/* 🍟 Fundo decorativo (frutas, batatas, etc.) */
+.fundo-decorativo {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1; /* ✅ acima da textura */
+  overflow: hidden;
+}
+
+/* =========================================================
+  ✅ CSS CORRIGIDO DAS IMAGENS FLUTUANTES 
+  =========================================================
+*/
+.fundo-decorativo img {
+  position: absolute;
+  opacity: 50;
+  transform: rotate(var(--rot, 0deg));
+  
+  width: var(--size, 180px);
+  height: var(--size, 180px);
+  border-radius: 50%;
+  object-fit: cover;
+
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Posições */
+.fundo-decorativo img:nth-child(1) {
+  top: 5%;
+  left: 6%;
+  --rot: -15deg;
+  --size: 220px;
+}
+.fundo-decorativo img:nth-child(2) {
+  top: 70%;
+  right: 10%;
+  --rot: 20deg;
+  --size: 180px;
+}
+.fundo-decorativo img:nth-child(3) {
+  top: 35%;
+  left: 65%;
+  --rot: -10deg;
+  --size: 160px;
+}
+.fundo-decorativo img:nth-child(4) {
+  bottom: 8%;
+  left: 12%;
+  --rot: 12deg;
+  --size: 200px;
+}
+.fundo-decorativo img:nth-child(5) {
+  top: 10%;
+  right: 5%;
+  --rot: 5deg;
+  --size: 170px;
+}
+/* ========================================================= */
+
+
+/* 🔝 Hierarquia visual (tudo acima do fundo) */
+.brand-header,
+section,
+.sacola {
+  position: relative;
+  z-index: 5;
+}
+.btn-flutuante,
+.modal {
+  position: relative;
+  z-index: 100;
+}
+
+/* =========================================================
+🧠 FONTES E BASE
+========================================================= */
+
+@font-face {
+  font-family: "Clafoutis Rapide";
+  src: url("font/ClafoutisRapide.woff2") format("woff2");
+  
+  /* Se o WOFF2 falhar no 'Ç', o navegador pode usar o TTF abaixo como fallback. */
+  /* Se você tiver o arquivo TTF, remova as barras para ativar a linha abaixo: */
+  /* src: url("font/ClafoutisRapide.ttf") format("truetype"); */
+  
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+a {
+  color: var(--brand-pink);
+  text-decoration: none;
+}
+
+/* =========================================================
+🔝 HEADER E NAVEGAÇÃO (VERSÃO LIMPA E ÚNICA)
+========================================================= */
+
+.brand-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background: rgba(167, 120, 175, 0.95);
+  backdrop-filter: blur(1px);
+  transition: all 0.3s ease;
+  padding: 6px 0 !important; /* Mais fina */
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ✅ Espaço para o conteúdo não ficar coberto */
+body {
+  padding-top: 110px !important; /* Ajustado para novo header */
+}
+
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px !important; /* Ajustado */
+  transition: 0.3s ease;
+}
+
+.brand-logo {
+  width: 90px !important; /* Ajustado */
+  height: auto;
+}
+
+.brand-name {
+  font-family: "Clafoutis Rapide", "Fredoka", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem !important; /* Ajustado */
+  color: #fff;
+  margin: 0;
+}
+
+.brand-tag {
+  font-size: 0.75rem !important; /* Ajustado */
+  color: #000000;
+  margin: 0;
+}
+
+/* Quando o usuário rolar pra baixo, esconde o topo */
+.brand-header.minimized .brand-wrap {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* 1. COMPORTAMENTO PADRÃO (DESKTOP) */
+.brand-header nav {
+  display: none; /* Removido */
+}
+
+/* =========================================================
+📦 SEÇÕES E CATEGORIAS
+========================================================= */
+
+section {
+  padding: 1.3rem 1rem 1.8rem;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+h2 {
+  font-family: "Clafoutis Rapide", "Fredoka", system-ui, sans-serif;
+  font-weight: 1000;
+  text-align: center;
+  font-size: 2.5rem;
+  margin: 0 0 2rem;
+  /* ... (fontes, etc) ... */
+  color: inherit; /* <-- MUDANÇA AQUI (Vai herdar a cor do body) */
+  text-shadow: 0 2px 18px rgba(0,0,0,0.3); /* Sombra mais escura */
+}
+/* =========================================================
+🧊 GRID DE PRODUTOS E CARDS (VERSÃO LIMPA E ÚNICA)
+========================================================= */
+
+.grid-produtos {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1rem;
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) inset;
+}
+
+/* Card individual */
+.item {
+  background: linear-gradient(
+    180deg,
+    rgba(35, 0, 50, 0.7) 0%,
+    rgba(20, 0, 30, 0.9) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+  width: 100%;
+  overflow: hidden;
+}
+.item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* 🔲 Mantém imagens sempre quadradas */
+.item img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  display: block;
+}
+
+.item h3 {
+  font-family: "Clafoutis Rapide", "Fredoka", system-ui, sans-serif;
+  font-weight: 200;
+  margin: 0.6rem 0 0.2rem;
+  font-size: 1.5rem;
+}
+
+.item span {
+  display: inline-block;
+  margin-top: 0.25rem;
+  background: var(--brand-pink); /* muda o fundo da etiqueta de preço */
+  color: #120b12;
+  padding: 0.4rem 0.65rem;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.item .ver-detalhes,
+.item .btn-abrir-modal /* Botão do Açaí */ {
+  margin-top: 0.6rem;
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: none;
+  border-radius: 10px;
+  background: #2b2b2b;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.item .ver-detalhes:hover,
+.item .btn-abrir-modal:hover {
+  filter: brightness(1.08);
+}
+
+/* ❌ Remove qualquer regra antiga que voltava pra 1 coluna */
+@media (max-width: 800px) {
+  .grid-produtos {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* =========================================================
+🛍️ SACOLA / CARRINHO
+========================================================= */
+
+.sacola {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  padding: 1rem;
+  margin: 2rem auto;
+  max-width: 980px;
+  border-radius: 12px;
+  z-index: 2;
+}
+.sacola h3 {
+  margin: 0 0 0.6rem;
+}
+
+.sacola ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.8rem;
+}
+.sacola li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #045f0412;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.sacola .btn-remove {
+  background: #750101;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sacola .btn-remove:hover {
+  filter: brightness(1.15);
+}
+
+#total-sacola {
+  margin: 0.7rem 0 1rem;
+}
+
+.btn-primario,
+.btn-whats {
+  padding: 0.8rem 1.1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-primario {
+  background: #8019af;
+  color: #ffffff; /* 👈 CORRIGIDO (branco) */
+}
+.btn-primario:hover {
+  background: #6a1491; /* 👈 CORRIGIDO (roxo escuro) */
+}
+.btn-whats {
+  background: #25d366;
+  color: #111;
+}
+.btn-whats:hover {
+  filter: brightness(1.05);
+}
+
+/* Botão flutuante (ANTIGO - escondido) */
+.btn-flutuante {
+  display: none !important;
+}
+
+/* Novo botão flutuante */
+.btn-carrinho-novo {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  background: linear-gradient(90deg, #f04fff 0%, #bd08ae 100%);
+  color: #222;
+  font-weight: 900;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 1.6rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 999999;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.btn-carrinho-novo:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+.btn-carrinho-novo.hidden {
+  display: none !important;
+}
+
+/* =========================================================
+📋 MODAL ANTIGO (Batatas / Itens Simples)
+========================================================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 10, 14, 0.72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal[aria-hidden="false"] {
+  display: flex;
+}
+
+.modal-content {
+  background: #1b0f27;
+  color: #fff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 15px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal img {
+  width: 100%;
+  max-height: 38vh;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 0.7rem;
+}
+
+.modal-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  padding-top: 0.75rem;
+  background: linear-gradient(180deg, transparent, rgba(22, 19, 27, 0.96) 40%);
+}
+
+/* Campo observação */
+#modalObs {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  width: 100%;
+  padding: 0.4rem 0;
+  font-size: 1rem;
+  outline: none;
+  resize: none;
+}
+#modalObs::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Esconde opções de produto no card (só mostra no modal) */
+.opcoes-produto {
+  display: none;
+}
+
+/* ===== Adicionais dentro do modal (Itens Simples) ===== */
+.modal-opcoes {
+  margin: 15px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.modal-opcoes label {
+  color: #fff;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.modal-opcoes input[type="checkbox"] {
+  accent-color: var(--cor-principal, #b6a402);
+}
+
+.opcoes-modal {
+  margin-top: 10px;
+}
+.opcoes-modal .extra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  color: #fff;
+  font-size: 15px;
+}
+.opcoes-modal .extra span:first-child {
+  flex: 1;
+  font-weight: 500;
+}
+.opcoes-modal .qtd-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.opcoes-modal .qtd-control button {
+  background: var(--cor-principal, #b18cff);
+  color: #fff;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.opcoes-modal .qtd-control button:hover {
+  background: #9b70ff;
+  transform: scale(1.1);
+}
+.opcoes-modal .qtd-control .qtd {
+  width: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+.opcoes-modal .extra .preco {
+  margin-left: 10px;
+  color: #ccc;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+💳 REVISÃO E PAGAMENTO
+========================================================= */
+
+/* ===== Botões de Entrega / Retirada ===== */
+.tipo-entrega {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.tipo-entrega .toggle-btn {
+  position: relative;
+  display: inline-block;
+  padding: 10px 18px;
+  border: 2px solid #7b1fa2;
+  border-radius: 30px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  background-color: transparent;
+  color: #7b1fa2;
+}
+.tipo-entrega .toggle-btn input[type="radio"] {
+  display: none;
+}
+.tipo-entrega .toggle-btn input[type="radio"]:checked ~ label,
+.tipo-entrega .toggle-btn:has(input[type="radio"]:checked) {
+  background-color: #7b1fa2;
+  color: white;
+}
+
+/* 🚗 Campo de endereço */
+.entrega {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.entrega label { /* 👈 MUDANÇA: Estiliza TODAS as labels */
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--brand-pink);
+}
+.entrega input { /* 👈 MUDANÇA: Estiliza TODOS os inputs */
+  width: 100%;
+  padding: 10px 12px; /* 👈 MUDANÇA: Mais alto */
+  border-radius: 10px;
+  border: 1px solid #7b1fa2; /* 👈 MUDANÇA: Borda roxa */
+}
+
+/* Opções de pagamento */
+.pagamento-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+.pagamento-opcoes label {
+  background: #2a153b;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #7b1fa2;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pagamento-opcoes input {
+  margin-right: 6px;
+}
+
+/* Inputs e textareas da revisão (checkout) */
+.entrega input,
+.pagamento input[type="radio"],
+#obsEntrega,
+#valorTroco {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px;
+  font-family: "Fredoka", sans-serif;
+}
+.entrega input:focus,
+#obsEntrega:focus,
+#valorTroco:focus {
+  border-color: #a10ca7 !important;
+  outline: none;
+}
+.pagamento label {
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* 💵 Pop-up de troco */
+#popupTroco {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 16px;
+  padding: 25px;
+  color: #fff;
+  width: 85%;
+  max-width: 320px;
+  text-align: center;
+  display: none; /* começa invisível */
+  z-index: 9999;
+}
+#popupTroco .popup-content {
+  background: #2a153b;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+}
+#popupTroco input {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  text-align: center;
+  background: #1a0f25;
+  color: #fff;
+}
+#popupTroco button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+/* === CORREÇÃO LISTA REVISAR PEDIDO === */
+#revisaoLista {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  margin-bottom: 24px;
+}
+#revisaoLista li {
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #2a153b;
+  line-height: 1.4;
+}
+#revisaoLista li .li-info {
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+  margin-right: 10px; /* Espaço entre o nome e o preço */
+}
+#revisaoLista li span {
+  text-indent: 0 !important;
+}
+#revisaoLista li button {
+  margin-left: auto !important; /* Joga o botão para a DIREITA */
+  flex-shrink: 0 !important; /* Impede o botão de "amassar" */
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+#revisaoLista li button:hover {
+  background: #c62828;
+  transform: scale(1.05);
+}
+
+/* =========================================================
+🎉 ANIMAÇÕES E TOASTS
+========================================================= */
+
+.toast {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: #1e1826;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  font-weight: 800;
+  z-index: 100000;
+  animation: toast-in 0.18s ease-out, toast-out 0.3s ease-in 1.7s forwards;
+}
+@keyframes toast-in {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes toast-out {
+  to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+.btn-flutuante.bump {
+  animation: cart-bump 0.6s ease;
+}
+@keyframes cart-bump {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.08);
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.confirm-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #25d366;
+  color: #111;
+  font-weight: 900;
+  font-size: 1.1rem;
+  padding: 1rem 1.6rem;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  z-index: 100000;
+  opacity: 0;
+  animation: popin 0.25s ease forwards, popout 0.4s ease 1.1s forwards;
+}
+@keyframes popin {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes popout {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+/* =========================================================
+🛠️ ADMIN / MODERADOR
+========================================================= */
+
+/* 🧱 Área dos botões administrativos no rodapé */
+.area-moderador {
+  text-align: center;
+  padding: 50px 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+.area-moderador button {
+  position: static !important;
+  background: #fc94ee;
+  color: #000;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 12px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+.area-moderador button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* 🔧 Botão de adicionais (fica um pouco diferente visualmente) */
+#btnGerenciarAdicionais {
+  background: #e873ff;
+  color: #000;
+  /* 🔒 Padrão: escondido e invisível */
+  display: none !important;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+/* 🟢 Quando ativa o modo moderador (senha correta) */
+body.modoModerador #btnGerenciarAdicionais {
+  display: inline-block !important;
+  opacity: 1;
+  pointer-events: auto !important; /* 👈 garante que seja clicável */
+}
+
+/* Efeito hover suave em TODOS os botões clicáveis */
+button,
+.btn-primario,
+.btn-whats,
+.btn-flutuante,
+.modal-close,
+.ver-detalhes {
+  transition: all 0.2s ease-in-out;
+}
+button:hover,
+.btn-primario:hover,
+.btn-whats:hover,
+.btn-flutuante:hover,
+.modal-close:hover,
+.ver-detalhes:hover {
+  transform: scale(1.05);
+  filter: brightness(0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 🔒 Itens pausados (bloqueia cliques no card, mas mantém botão ativo) */
+.item.pausado {
+  opacity: 0.4;
+  position: relative;
+  pointer-events: none; /* bloqueia tudo */
+}
+.item.pausado::after {
+  content: "⏸️ Indisponível";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 16px;
+  pointer-events: none;
+}
+.item.pausado .btn-pausar {
+  pointer-events: auto !important;
+  z-index: 9999;
+}
+
+/* 🎛️ Botão admin flutuante sobre o item */
+.item.editavel .btn-admin {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff07c1;
+  color: #000;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  z-index: 5;
+  transition: 0.2s;
+}
+.item.editavel .btn-admin:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Painel de Adicionais */
+#painelAdicionais {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+#painelAdicionais[aria-hidden="false"] {
+  display: flex;
+}
+#painelAdicionais .modal-content {
+  background: rgb(0, 0, 0);
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#listaAdicionais li {
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#listaAdicionais li span {
+  font-weight: 600;
+}
+#listaAdicionais li button {
+  padding: 5px 10px;
+  border: none;
+  background: #ff73f8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Adicionais Pausados */
+.extra.pausado {
+  opacity: 0.4;
+  position: relative;
+  pointer-events: none;
+}
+.extra.pausado::after {
+  content: "⏸️ Indisponível";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 10px;
+  z-index: 2;
+}
+
+/* =========================================================
+🧊 NOVO MODAL (AÇAÍ BUILDER) - CSS ISOLADO (TEMA DARK)
+========================================================= */
+
+/* O fundo escuro (overlay) */
+.acai-modal-container {
+  display: none; /* Começa escondido */
+  position: fixed; /* Fica por cima de tudo */
+  z-index: 10000; /* Acima do modal antigo */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Fundo preto semi-transparente */
+  overflow-y: auto; /* Permite rolar se o modal for maior que a tela */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Classe que o JavaScript vai adicionar para ABRIR o modal */
+.acai-modal-container.aberto {
+  display: flex;
+}
+
+/* A caixa (conteúdo) com o TEMA DARK */
+.acai-modal-content {
+  background-color: #1b0f27; /* 👈 SEU FUNDO DARK */
+  color: #fff; /* 👈 SEU TEXTO BRANCO */
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px; /* Limite de largura */
+  max-height: 90vh; /* Limite de altura */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil */
+}
+
+/* Cabeçalho (Título e botão Fechar) */
+.acai-modal-header {
+  display: flex;
+  /* justify-content: space-between; */ /* <-- Linha antiga comentada */
+  justify-content: center; /* 👈 MUDAMOS PARA 'center' */
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative; /* 👈 ADICIONAMOS ISSO (Importante!) */
+}
+.acai-modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+
+/* Botão de fechar do Açaí */
+.btn-fechar-modal {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+
+  /* 👇 ADICIONAMOS ESTAS 3 LINHAS 👇 */
+  position: absolute; /* Tira ele do fluxo */
+  top: 10px; /* Distância do topo */
+  right: 15px; /* Distância da direita */
+}
+.btn-fechar-modal:hover {
+  color: #fff;
+}
+
+/* Corpo (Onde ficam os steps) */
+.acai-modal-body {
+  padding: 10px 20px 20px 20px;
+  overflow-y: auto; /* Permite rolar só o corpo */
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+.acai-modal-body fieldset {
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Borda sutil */
+  border-radius: 6px;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+}
+.acai-modal-body legend {
+  font-weight: bold;
+  padding: 0 5px;
+  margin-left: 10px;
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+
+/* Estilo de cada item de opção (radio ou checkbox) */
+.acai-modal-body .opcao-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil */
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+.acai-modal-body .opcao-item:last-child {
+  border-bottom: none;
+}
+.acai-modal-body .opcao-item label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-left: 10px;
+  cursor: pointer;
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+.acai-modal-body .preco-opcao {
+  font-weight: 500;
+  color: #ccc; /* 👈 Cor sutil */
+}
+.acai-modal-body input[type="radio"],
+.acai-modal-body input[type="checkbox"] {
+  accent-color: var(--brand-purple); /* 👈 Usa sua cor principal */
+}
+
+/* Estilo das sugestões (Se você adicionar de volta) */
+.sugestoes-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+}
+.sugestao-chip {
+  background: rgba(255, 255, 255, 0.1); /* 👈 Fundo sutil */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Borda sutil */
+  border-radius: 20px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #fff; /* 👈 TEXTO BRANCO */
+}
+.sugestao-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Rodapé (Quantidade e Preço Total) */
+
+.acai-modal-footer {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil */
+
+  background: #11091a; /* 👈 Um pouco mais escuro que o fundo */
+
+  border-radius: 0 0 8px 8px;
+
+}
+
+
+
+/* Botão Adicionar do Açaí (AGORA ROXO) */
+
+.btn-add-carrinho {
+
+  background-color: var(
+
+    --brand-purple,
+
+    #8019af
+
+  ); /* 👈 SUA COR ROXA PADRÃO */
+
+  color: #000000; /* 👈 SEU TEXTO PRETO (igual .btn-primario) */
+
+  border: none;
+
+  border-radius: 10px; /* Igual .btn-primario */
+
+  padding: 12px 20px;
+
+  font-size: 1rem;
+
+  font-weight: 800; /* Igual .btn-primario */
+
+  cursor: pointer;
+
+}
+
+.btn-add-carrinho:hover {
+
+  filter: brightness(1.1); /* 👈 Efeito hover padrão */
+
+}
+
+
+
+/* Controles de Quantidade (+ / -) no rodapé */
+
+.acai-modal-footer .qtd-control {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  padding: 4px 10px;
+
+  border-radius: 20px;
+
+  color: #fff;
+
+}
+
+.acai-modal-footer .qtd-control button {
+
+  background: var(--brand-purple, #8019af); /* 👈 SUA COR ROXA */
+
+  color: #fff;
+
+  border: none;
+
+  width: 24px;
+
+  height: 24px;
+
+  border-radius: 50%;
+
+  font-size: 16px;
+
+  line-height: 24px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+}
+
+.acai-modal-footer .qtd-control button:hover {
+
+  filter: brightness(1.1);
+
+  transform: scale(1.1);
+
+}
+
+.acai-modal-footer .qtd-control .qtd {
+
+  width: 20px;
+
+  text-align: center;
+
+  font-weight: 600;
+
+  font-size: 1.1rem;
+
+  color: #fff;
+
+}
+
+/* ==============================================
+   CSS DE IMPRESSÃO (COMANDA TÉRMICA 80mm) - VERSÃO FINAL (76mm)
+   ============================================== */
+@media print {
+  
+  /* 1. Define o tamanho da página como A4 (para "enganar" o navegador)
+     e zera as margens da PÁGINA. */
+  @page {
+    size: 210mm;
+    margin: 0mm !important; 
+  }
+
+  /* 2. Zera o corpo e o HTML à força.
+     Define a largura do CORPO para 80mm, forçando a quebra de linha. */
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 80mm !important;
+    height: auto !important;
+    background: none !important;
+  }
+
+  /* 3. Esconde TUDO que não é a comanda */
+  body > *:not(#comanda-impressao) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* 4. Força a comanda a colar no TOPO e na ESQUERDA da página A4 */
+  #comanda-impressao {
+    display: block !important;
+    position: absolute !important; 
+    top: 0mm !important;    /* COLA NO TOPO */
+    left: 0mm !important;   /* COLA NA ESQUERDA */
+    margin: 0 !important;
+    padding: 0 !important; 
+    
+    /* 5. Define a largura real do conteúdo com margem de segurança */
+    width: 76mm !important; /* 76mm (para 2mm de margem de cada lado) */
+    
+    font-family: "Courier New", Courier, monospace;
+    color: #000;
+    background: #fff;
+    font-size: 10pt;
+    word-wrap: break-word; /* Força o "enter" no texto */
+  }
+  
+  /* --- O resto dos estilos (títulos, listas, etc.) --- */
+
+  #comanda-impressao h3 {
+    font-size: 12pt;
+    text-align: center;
+    border-bottom: 1px dashed #000;
+    padding-bottom: 2mm;
+    margin-bottom: 3mm;
+    margin-top: 3mm; 
+  }
+  #comanda-impressao p {
+    margin: 1mm 0;
+    font-size: 9pt;
+  }
+  #comanda-impressao ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #comanda-impressao li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9pt;
+    line-height: 1.4;
+    border-bottom: 1px dotted #ccc;
+    padding: 1mm 0;
+    word-break: break-word;
+  }
+  #comanda-impressao li b {
+    max-width: 80%;
+  }
+  #comanda-impressao li i {
+    font-size: 8pt;
+    display: block;
+    width: 100%;
+    margin-top: 0.5mm;
+    color: #333;
+  }
+  #comanda-impressao li span {
+    white-space: nowrap;
+    text-align: right;
+    margin-left: 5mm;
+  }
+  #comanda-impressao .comanda-total {
+    font-size: 11pt;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 3mm;
+    padding-top: 2mm;
+    border-top: 1px dashed #000;
+  }
+  #comanda-impressao .comanda-info {
+    font-size: 9pt;
+    margin-top: 3mm;
+    border-top: 1px dashed #000;
+    padding-top: 2mm;
+  }
+  #comanda-impressao .comanda-info strong {
+    display: block;
+    margin-bottom: 1mm;
+  }
+  #comanda-impressao .comanda-info span {
+    display: block;
+    margin-bottom: 0.5mm;
+  }
+  #comanda-impressao p:last-of-type {
+    text-align: center;
+    font-size: 8pt;
+    margin-top: 5mm;
+    border-top: 1px dashed #000;
+    padding-top: 2mm;
+  }
+}
+
+/* ==============================================
+   Centraliza o card "Monte seu Açaí" (Item Único)
+   ============================================== */
+
+/* 1. Identifica o grid DENTRO da seção #Acai-Pronto 
+*/
+#Acai-Pronto .grid-produtos {
+  /* 2. Desliga o 'grid' e liga o 'flex' 
+       (Usamos !important para sobrepor suas regras antigas)
+  */
+  display: flex !important;
+  grid-template-columns: none !important; /* Desativa as colunas */
+
+  /* 3. Centraliza o item no meio */
+  justify-content: center;
+  align-items: center;
+}
+
+/* 4. Define um tamanho para o card, 
+     já que ele não está mais no grid 
+*/
+#Acai-Pronto .grid-produtos .item {
+  width: 90%; /* Fica bom em celular */
+  max-width: 450px; /* Limite de largura no PC */
+  min-width: 300px; /* Limite mínimo */
+  cursor: pointer; /* 👈 ADICIONE ESTA LINHA */
+}
+
+/* ==============================================
+   CSS DO POP-UP "LOJA FECHADA"
+   ============================================== */
+
+#loja-fechada-overlay {
+  position: fixed; /* Fica por cima de tudo */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Usa o seu fundo roxo escuro */
+  background: rgba(27, 15, 39, 0.95); /* #1b0f27 com 95% de opacidade */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; /* Começa como 'none', o JS muda para 'flex' */
+  align-items: center;
+  justify-content: center;
+  z-index: 999999; /* Mais alto que qualquer modal */
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.loja-fechada-content h1 {
+  font-family: "Clafoutis Rapide", "Fredoka", system-ui, sans-serif;
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  /* Garante que a cor do H2 não seja preta */
+  color: #ffffff !important; 
+}
+
+.loja-fechada-content p {
+  font-size: 1.2rem;
+  color: #eee;
+}
+
+/* =========================================
+   CSS DO MODO MODERADOR (BOTÕES DE PAUSA)
+   ========================================= */
+.btn-pausar {
+  display: none; /* Escondido por padrão */
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #ff0000;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+/* Quando o modo moderador está ativo, mostra os botões */
+body.modoModerador .btn-pausar {
+  display: flex;
+}
+/* Estilo do item quando pausado */
+.item.pausado {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+.item.pausado .btn-pausar {
+  background: #28a745; /* Fica verde para "despausar" */
+}
+/* Faz o conteúdo do modal rolar, deixando espaço pro rodapé */
+.modal-content {
+    overflow-y: auto;
+    max-height: 90vh;
+    position: relative; /* Necessário pro sticky funcionar dentro dele */
+}
+
+/* O Rodapé Fixo e Compacto */
+.modal-footer {
+    position: sticky;
+    bottom: 0;
+    /* Fundo escuro com leve transparência (95% opaco) */
+    background: rgba(17, 9, 26, 0.95);
+    /* Desfoque no fundo para um efeito "vidro" moderno (opcional) */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    padding: 10px 20px; /* Um pouco mais de respiro */
+    border-top: 0px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+    
+    /* Arredonda apenas as pontas de baixo para casar com o modal */
+    border-radius: 0 0 16px 16px; 
+    /* (Ajuste o 16px para combinar com o arredondamento do seu .modal-content) */
+}
+
+/* Preço na esquerda */
+.preco-flutuante-left {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+.preco-flutuante-left small {
+    color: #ccc;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+.preco-flutuante-left span {
+    color: var(--brand-yellow, #ffffff); /* Use sua cor de destaque */
+    font-weight: 800;
+    font-size: 1.4rem;
+}
+
+/* Ajuste fino no botão para não ficar gigante */
+.modal-footer .btn-primario {
+    margin: 0;      /* Tira margens externas */
+    width: auto;    /* Não ocupa a largura toda */
+    min-width: 150px; /* Tamanho mínimo bom pra clicar */
+    padding: 12px 20px;
+}
+
+/* ==================================================
+   FIX 5.0: CHECKBOX RECONSTRUÍDO (IDÊNTICO AO RADIO)
+   ================================================== */
+
+/* A caixa de cada opção (Blend-se, Monte Salada) */
+.opcao-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative; /* Importante para o novo botão */
+}
+.opcao-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================================================
+   FIX 6.0: CHECKBOX DESENHADO EXATAMENTE COMO VOCÊ PEDIU
+   ================================================== */
+
+/* A caixa de cada opção (Blend-se, Monte Salada) */
+.opcao-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative; /* Importante para o novo botão */
+}
+.opcao-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* O texto (span) */
+.opcao-item span {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 1rem;
+    padding-left: 30px; /* Abre espaço para o novo botão */
+}
+
+/* 1. ESCONDE o checkbox quadrado feio */
+.opcao-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* 2. CRIA A BASE BRANCA (Tamanho total 10px) */
+.opcao-item span::before {
+    content: '';
+    display: block;
+    width: 10px;  /* <-- SEU TAMANHO CORRETO */
+    height: 10px; /* <-- SEU TAMANHO CORRETO */
+    border: 1px solid #ccc; /* Borda cinza (fina) */
+    border-radius: 50%;
+    
+    position: absolute;
+    left: 15px; 
+    top: 50%;
+    transform: translateY(-50%);
+    
+    transition: all 0.2s;
+    background-color: #fff; /* "inteiro branco" */
+}
+
+/* 3. CRIA O MIOLO ROXO (Proporcional e Centralizado) */
+.opcao-item span::after {
+    content: '';
+    display: block;
+    width: 7px;  /* Miolo de 5px (proporcional) */
+    height: 7px; 
+    background: #835870; /* "bolinha roxa... #835870" */
+    border-radius: 50%;
+    
+    position: absolute;
+    /* Centralizado: 15px(left) + 1px(borda) + ( (10-2)-5 ) / 2 = 16 + 1.5 = 17.5px */
+    left: 17.25px; 
+    top: 50%;
+    
+    transform: translateY(-50%) scale(0); /* Começa escondido */
+    transition: all 0.2s;
+}
+
+/* 4. QUANDO MARCADO: Mostra o miolo roxo */
+.opcao-item input[type="checkbox"]:checked + span::after {
+    transform: translateY(-50%) scale(1); 
+}
+
+/* (Opcional: Se quiser que a borda cinza fique roxa também ao marcar) */
+.opcao-item input[type="checkbox"]:checked + span::before {
+    border-color: #835870;
+}
+
+/* 5. Estilo de desabilitado (quando passa o limite) */
+.opcao-item input[type="checkbox"]:disabled + span {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.opcao-item input[type="checkbox"]:disabled + span::before {
+    border-color: #555;
+    background-color: #ddd;
+}
+.opcao-item input[type="checkbox"]:disabled + span::after {
+    background-color: #999;
+}
+/* =========================================
+   CSS MALUCO: TRANSIÇÃO DE FUNDO
+   ========================================= */
+
+/* =========================================================
+🖼️ TEXTURA GRANULADA POR CIMA DA COR (NOVO)
+========================================================= */
+body::after {
+  content: "";
+  position: fixed; /* Fica fixa durante o scroll */
+  inset: 0;        /* Ocupa 100% da tela */
+  
+  /* --- COLOQUE O CAMINHO DA SUA IMAGEM AQUI --- */
+  background: url("img/acai-textura-1.png") center/cover no-repeat; 
+  /* OU GERE UMA SE VOCÊ NÃO TIVER */
+
+  opacity: 1; /* Ajuste este valor (0.05 a 0.2) para controlar a intensidade */
+  mix-blend-mode: overlay; /* Experimente: 'multiply', 'soft-light', 'overlay' */
+  pointer-events: none; /* Não bloqueia cliques */
+  z-index: 2; /* Acima da cor do body, mas abaixo do conteúdo principal */
+}
+/* =========================================================
+   FIX FINAL: LAYOUT DE LISTA (ESTILO IFOOD)
+   (Substitui todos os blocos "FIX" antigos)
+   ========================================================= */
+
+/* 1. Transforma o grid antigo em uma lista de 1 coluna */
+.grid-produtos {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important; /* Desliga o grid */
+    gap: 12px !important;
+    
+    /* Remove o padding e fundo do container do grid */
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 10px !important;
+}
+
+/* 2. Muda o card para o layout de linha (Imagem | Info) */
+.item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 12px !important;
+    /* O visual (fundo roxo, borda) do .item original será mantido */
+}
+
+/* 3. Ajusta a imagem para a esquerda */
+.item img {
+    width: 90px !important;
+    height: 90px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important; 
+    aspect-ratio: 1 / 1 !important;
+}
+
+/* 4. A nova <div> que agrupa os textos */
+.item-info {
+    display: flex;
+    flex-wrap: wrap;         /* PERMITE QUEBRA DE LINHA */
+    flex-grow: 1;            
+    align-items: center;     /* Alinha preço e botão verticalmente */
+    row-gap: 4px;            /* Espaço entre a linha do título e a do preço */
+    column-gap: 10px;        /* Espaço ENTRE o preço e o botão */
+}
+
+/* 5. Título e Descrição (Linha de cima) */
+.item .item-info h3,
+.item-info .item-desc {
+    width: 100%;             /* Ocupa a linha inteira, forçando quebra */
+    margin: 0 !important;
+}
+.item-info h3 {
+    font-size: 1.1rem;
+    line-height: 1.2;
+}
+.item-info .item-desc {
+    font-size: 0.85rem;
+    color: var(--muted, #cfcfe3);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px !important;
+}
+
+/* 6. Preço (Linha de baixo, esquerda) */
+.item .item-info span { 
+    margin: 0 !important;
+    width: auto !important; /* LARGURA AUTOMÁTICA */
+    display: inline-block !important; /* Garante que fique na linha */
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--brand-pink, #a1728c);
+    padding: 0 !important;
+    background: none !important; 
+}
+
+/* 7. Botão (Linha de baixo, ao lado do preço) */
+.item .item-info .ver-detalhes,
+.item .item-info .btn-abrir-modal {
+    width: auto !important; /* LARGURA AUTOMÁTICA */
+    display: inline-block !important; /* Garante que fique na linha */
+    padding: 6px 14px !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+}
+
+/* 8. Desliga a regra de 2 colunas no mobile */
+@media (max-width: 800px) {
+  .grid-produtos {
+    grid-template-columns: none !important;
+  }
+}
+/* =========================================================
+   FIX 4.0: POSICIONAMENTO FINAL DAS PLANTAS FIXAS (CORRIGIDO)
+   ========================================================= */
+
+/* Esta regra anula qualquer regra de posição TOP/LEFT/BOTTOM/RIGHT e garante que seja FIXO */
+.fundo-decorativo img { /* <-- CLASSE CORRIGIDA! */
+    /* Anula as posições antigas de TOP/LEFT/RIGHT/BOTTOM e garante que seja fixo */
+    left: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    
+    /* Garante que o elemento seja fixo na tela (não role) */
+    position: fixed !important; 
+}
+
+/* 1. Posição da Planta 1 (Folhagem Cheia - Inferior Esquerda) */
+.fundo-decorativo img:nth-child(2) { /* <-- CLASSE CORRIGIDA! */
+    bottom: 8% !important; 
+    left: -5% !important; /* Colado no limite esquerdo */
+    
+    /* Garante que as posições TOP e RIGHT não interfiram */
+    top: auto !important;
+    right: auto !important;
+    
+    transform: rotate(-10deg) !important;
+}
+
+/* 2. Posição da Planta 2 (Folhagem Longa e Fina - Superior Direita) */
+.fundo-decorativo img:nth-child(1) { /* <-- CLASSE CORRIGIDA! */
+    top: 5% !important;
+    right: -8% !important; /* Colado no limite direito */
+    
+    /* Garante que as posições LEFT e BOTTOM não interfiram */
+    left: auto !important;
+    bottom: auto !important;
+    
+    transform: rotate(-20deg) !important;
+}
+
+/* =========================================================
+   FIX FINAL: PROPORÇÃO DA FOTO NO POP-UP (1:1)
+   ========================================================= */
+.modal img {
+    /* Força a proporção 1:1 (Quadrado Perfeito) */
+    aspect-ratio: 1 / 1 !important;
+    
+    /* Remove a limitação de altura que estava forçando o retângulo */
+    max-height: auto !important; 
+    
+    /* Garante que ocupe a largura total do modal */
+    width: 100%;
+    
+    /* Adiciona margem de volta */
+    margin-bottom: 0.7rem;
+}
+
+
+/* =========================================================
+   FIX FINAL: PINO CENTRAL E BOTÃO CLICÁVEL
+   ========================================================= */
+
+/* Garante que o mapa possa conter o alvo */
+#map-leaflet {
+    position: relative !important;
+}
+
+/* 2. Desenha o PINO FIXO no centro do mapa */
+#centro-mira-visual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    /* Tamanho padrão do pino de mapa */
+    width: 25px; 
+    height: 41px; 
+    
+    /* Imagem do Pino (Puxando direto do servidor do Leaflet) */
+    background-image: url('https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    
+    /* Limpa os estilos antigos de bolinha */
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    
+    /* O PULO DO GATO: */
+    /* translate(-50%, -100%) faz com que a PONTA de baixo do pino fique no centro exato */
+    /* (X centralizado, Y puxado 100% pra cima) */
+    transform: translate(-50%, -100%); 
+    
+    /* Adiciona uma sombrinha pra ficar bonito */
+    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.5));
+    
+    z-index: 1000; 
+    pointer-events: none; 
+}
+
+/* 2. FORÇA O BOTÃO A FICAR CLICÁVEL */
+/* O rodapé do modal do mapa DEVE ter um z-index alto */
+.acai-modal-container .acai-modal-footer {
+    position: relative; /* Necessário para z-index funcionar */
+    z-index: 2000 !important; /* Ganha do mapa */
+}
+
+/* =========================================================
+   FIX FINAL: ALINHAMENTO PERFEITO (ENTREGA)
+   ========================================================= */
+
+.toggle-btn {
+    /* 1. Layout Flexível */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    
+    /* 2. CENTRALIZA o conjunto (Bolinha + Texto) no meio do botão */
+    justify-content: center !important; 
+    
+    /* 3. Mantém eles juntinhos */
+    gap: 10px !important;
+    
+    /* 4. Estética do botão */
+    width: 100%; /* Ocupa a largura disponível (ou mude para 'auto' se quiser botão pequeno) */
+    padding: 1px 20px; /* Um pouco mais cheio */
+    background: rgba(255,255,255,0.05) !important; /* Fundo leve para ver a área */
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 30px !important; /* Borda redonda */
+    color: #fff !important;
+    cursor: pointer;
+    margin-bottom: 8px; /* Espacinho entre eles */
+}
+
+/* Quando selecionado (fundo roxo) */
+.toggle-btn:has(input:checked) {
+    background: var(--brand-purple, #8019af) !important;
+    border-color: var(--brand-purple, #8019af) !important;
+}
+
+/* Reseta a bolinha */
+.toggle-btn input[type="radio"] {
+    margin: 0 !important;
+    position: static !important;
+    flex-shrink: 0;
+    accent-color: #fff; /* Bolinha branca para contrastar */
+    width: 18px !important;
+    height: 18px !important;
+}
+
+/* =========================================================
+   FIX FINAL: BOTÕES DE ENTREGA ELEGANTES (LADO A LADO)
+   ========================================================= */
+
+/* 1. O Container (A caixa que segura os dois botões) */
+/* Isso força os botões a ficarem na mesma linha */
+.entrega p + label, /* Seleciona os labels logo após o título "Opção de entrega" se houver containers errados */
+.tipo-entrega {     /* Se você tiver uma div envolvendo eles */
+    display: flex;
+    flex-direction: row;
+    gap: 15px; /* Espaço entre os botões */
+    width: 100%;
+}
+
+/* 2. O Botão Individual (Clean) */
+.toggle-btn {
+    /* Layout interno (Bolinha + Texto) */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important; /* Centraliza o conteúdo */
+    gap: 5px !important;
+    
+    /* Tamanho e Forma */
+    flex: 1; /* Faz os dois botões terem o mesmo tamanho (50% cada) */
+    padding: 10px 5px; /* Mais fino verticalmente */
+    border-radius: 12px; /* Cantos suaves */
+    
+    /* Estilo "Desativado" (Padrão) - Bem leve */
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Borda sutil */
+    color: #ccc !important; /* Texto cinza claro */
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Animação suave */
+}
+
+/* 3. Estilo "Ativo" (Quando Selecionado) */
+/* Fica roxo clarinho com borda brilhante */
+.toggle-btn:has(input:checked) {
+    background: rgba(128, 25, 175, 0.15) !important; /* Roxo bem transparente */
+    border-color: var(--brand-purple, #8019af) !important; /* Borda Roxo Vivo */
+    color: #fff !important; /* Texto Branco */
+    box-shadow: 0 0 10px rgba(128, 25, 175, 0.2); /* Brilho sutil */
+}
+
+/* 4. A Bolinha (Radio) */
+.toggle-btn input[type="radio"] {
+    margin: 0 !important;
+    width: 12px !important;
+    height: 12px !important;
+    accent-color: var(--brand-purple, #8019af); /* Roxo */
+    flex-shrink: 0;
+}

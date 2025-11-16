@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Açaíse - Cardápio Digital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css?v=1.3" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <style>
+      /* Ajustes internos */
+      #sugestoes { background: #2a153b; color: white; border: 1px solid #7b1fa2; border-radius: 10px; list-style: none; padding: 0; margin-top: 5px; max-height: 160px; overflow-y: auto; display: none; text-align: left; position: relative; z-index: 9999; }
+      #sugestoes li { padding: 10px; cursor: pointer; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      #sugestoes li:hover { background: #7b1fa2; }
+      #resultadoEntrega { margin-top: 10px; font-size: 14px; color: #ccc; }
+      .modal-nome-backdrop { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+      .modal-nome-content { display: block; background: var(--card, #16131b); color: var(--text, #ffffff); padding: 25px; border-radius: 12px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); }
+      .modal-nome-content h3 { color: var(--brand-pink, #fcd594); margin-top: 0; font-size: 1.5em; }
+      .modal-nome-content p { font-size: 0.95em; color: var(--muted, #cfcfe3); margin-bottom: 20px; }
+      .modal-nome-content input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--stroke, #2a153b); background: var(--bg, #0f0f12); color: var(--text, #ffffff); font-size: 1em; text-align: center; margin-bottom: 20px; }
+      .modal-nome-content input:focus { border-color: var(--brand-pink, #fcd594); outline: none; }
+      .modal-nome-content button { width: 100%; font-size: 1.1em; padding: 12px; }
+      #map-modal-container { display: none; z-index: 10001; }
+      #map-modal-container.aberto { display: flex; }
+      #map-leaflet { width: 100%; height: 400px; z-index: 1; }
+      .leaflet-popup-content-wrapper { background: #333; color: #fff; }
+      .leaflet-popup-content { color: #fff; }
+      .leaflet-popup-tip { background: #333; }
+      .titulo-opcao { color: var(--brand-pink, #fcd594); font-size: 1.1em; margin: 15px 0 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+      
+      /* Ajuste para radios de tamanho */
+      .radio-opcao { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; cursor: pointer; }
+      .radio-opcao input { margin-right: 10px; accent-color: var(--brand-pink); }
+      .radio-opcao span { flex: 1; }
+      .radio-opcao .preco { color: #ccc; font-size: 0.9em; }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="fundo-decorativo">
+    <img src="img/planta-fundo-left.png" alt="Planta decorativa esquerda">
+    <img src="img/planta-fundo-right.png" alt="Planta decorativa direita">
+</div>
+
+    <div id="loja-fechada-overlay" style="display: none">
+      <div class="loja-fechada-content">
+        <img src="img/acai-se.png" alt="Logo" style="width: 100px; margin-bottom: 20px" />
+        <h1>Loja Fechada</h1>
+        <p id="loja-fechada-mensagem"></p>
+      </div>
+    </div>
+
+    <div class="fundo-decorativo">
+       </div>
+
+    <header class="brand-header">
+      <div class="brand-wrap">
+        <img class="brand-logo" src="img/acai-se.png" alt="Açaíse" />
+        <div class="brand-titles">
+          <h1 class="brand-name"></h1>
+        </div>
+      </div>
+    </header>
+
+<section id="acai-bases">
+      <h2>Açaí no Pote</h2>
+      <div class="grid-produtos">
+
+        <div class="item" data-name="Açaí Artesanal" data-price="25.50" data-desc="Batido com fórmula da casa, leve, adoçado." data-img="img/artesanal.jpg">
+  
+  <img src="img/artesanal.jpg" alt="Artesanal">
+  
+  <div class="item-info">
+    <h3>Artesanal</h3>
+    <span>A partir de R$ 25,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_artesanal" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_artesanal" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_artesanal" data-extra="22"><span>700ml</span><span class="preco">+R$ 22,00</span></label>
+
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+  
+</div>
+
+       <div class="item" data-name="Açaí com Mel" data-price="27.50" data-desc="Batido com mel natural." data-img="img/mel.jpg">
+  
+  <img src="img/mel.jpg" alt="Mel">
+  
+  <div class="item-info">
+    <h3>Mel</h3>
+    <span>A partir de R$ 27,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_mel" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_mel" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_mel" data-extra="22"><span>700ml</span><span class="preco">+R$ 22,00</span></label>
+
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Cupuaçaí" data-price="26.50" data-desc="Meio açaí especial, meio cupuaçu." data-img="img/cupuacu.jpg">
+  
+  <img src="img/cupuacu.jpg" alt="Cupuaçaí">
+  
+  <div class="item-info">
+    <h3>Cupuaçaí</h3>
+    <span>A partir de R$ 26,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_cupuacai" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_cupuacai" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_cupuacai" data-extra="21"><span>700ml</span><span class="preco">+R$ 21,00</span></label>
+
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Açaí Fit" data-price="34.50" data-desc="Açaí especial batido com whey, mel, castanha do pará e banana." data-img="img/fit.jpg">
+  
+  <img src="img/fit.jpg" alt="Fit">
+  
+  <div class="item-info">
+    <h3>Fit</h3>
+    <span>A partir de R$ 34,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_fit" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_fit" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Blend-se" data-price="23.50" data-desc="Açaí em camadas com 4 toppings grátis à sua escolha." data-img="img/blend.jpg">
+  
+  <img src="img/blend.jpg" alt="Blend-se">
+  
+  <div class="item-info">
+    <h3>Blend-se</h3>
+    <span>A partir de R$ 23,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_blend" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_blend" data-extra="10"><span>500ml</span><span class="preco">+R$ 10,00</span></label>
+     
+     <h4 class="titulo-opcao">🤩 Escolha até 4 Grátis</h4>
+     <div class="free-topping-group">
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Leite em pó"><span>Leite em pó</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Leite condensado"><span>Leite condensado</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Banana fatiada"><span>Banana fatiada</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Granola Tia Sônia"><span>Granola T. Sônia</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Mel"><span>Mel</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Paçoca"><span>Paçoca</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Farinha de tapioca"><span>Far. de tapioca</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Xerém de amendoim"><span>Xerém amend.</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Amendoim"><span>Amendoim</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Abacaxi"><span>Abacaxi</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Uva verde"><span>Uva verde</span></label>
+          <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Grátis: Manga"><span>Manga</span></label>
+     </div>
+
+     <h4 class="titulo-opcao">➕ Toppings Extras (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="EXTRA: Manga" data-extra="3.00"></div>
+
+     <h4 class="titulo-opcao">💎 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Protein" data-price="32.50" data-desc="Batido com whey protein e mel." data-img="img/protein.jpg">
+  
+  <img src="img/protein.jpg" alt="protein">
+  
+  <div class="item-info">
+    <h3>Protein</h3>
+    <span>A partir de R$ 32,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_protein" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_protein" data-extra="10"><span>500ml</span><span class="preco">+R$ 10,00</span></label>
+     
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Crocante" data-price="30.50" data-desc="Açaí especial envolvido com pasta de amendoim crocante Vitanuts." data-img="img/crocante.jpg">
+  
+  <img src="img/crocante.jpg" alt="Crocante">
+  
+  <div class="item-info">
+    <h3>Crocante</h3>
+    <span>A partir de R$ 30,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_crocante" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_crocante" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Choco Nuts" data-price="31.50" data-desc="Açaí especial envolvido com pasta de chocolate crocante." data-img="img/choco.jpg">
+  
+  <img src="img/choco.jpg" alt="Choco Nuts">
+  
+  <div class="item-info">
+    <h3>Choco Nuts</h3>
+    <span>A partir de R$ 31,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_choco" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_choco" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+        <div class="item" data-name="Nuts" data-price="31.50" data-desc="Açaí especial envolvido com pasta de castanha Vitanuts sabor coco." data-img="img/nuts.jpg">
+  
+  <img src="img/nuts.jpg" alt="Nuts">
+  
+  <div class="item-info">
+    <h3>Nuts</h3>
+    <span>A partir de R$ 31,50</span>
+    <button class="ver-detalhes">Montar</button>
+  </div>
+  <div class="opcoes-produto">
+     <h4 class="titulo-opcao">📏 Tamanho</h4>
+     <label class="radio-opcao"><input type="radio" name="tamanho_nuts" checked data-extra="0"><span>300ml</span><span class="preco">Incluso</span></label>
+     <label class="radio-opcao"><input type="radio" name="tamanho_nuts" data-extra="11"><span>500ml</span><span class="preco">+R$ 11,00</span></label>
+     
+     <h4 class="titulo-opcao">🍧 Toppings (R$ 3,00 cada)</h4>
+     <div class="extra"><span>Leite em pó</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite em pó" data-extra="3.00"></div>
+     <div class="extra"><span>Leite condensado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Leite condensado" data-extra="3.00"></div>
+     <div class="extra"><span>Banana fatiada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Banana fatiada" data-extra="3.00"></div>
+     <div class="extra"><span>Granola Tia Sônia</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Granola Tia Sônia" data-extra="3.00"></div>
+     <div class="extra"><span>Mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Mel" data-extra="3.00"></div>
+     <div class="extra"><span>Paçoca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Paçoca" data-extra="3.00"></div>
+     <div class="extra"><span>Farinha de tapioca</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Farinha de tapioca" data-extra="3.00"></div>
+     <div class="extra"><span>Xerém de amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Xerém de amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Amendoim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Amendoim" data-extra="3.00"></div>
+     <div class="extra"><span>Abacaxi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Abacaxi" data-extra="3.00"></div>
+     <div class="extra"><span>Uva verde</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Uva verde" data-extra="3.00"></div>
+     <div class="extra"><span>Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,00</span><input type="hidden" value="Manga" data-extra="3.00"></div>
+     
+     <h4 class="titulo-opcao">💪 Extras Premium</h4>
+     <div class="extra"><span>Whey protein</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$10,00</span><input type="hidden" value="Whey protein" data-extra="10.00"></div>
+     <div class="extra"><span>Morango</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Morango" data-extra="6.00"></div>
+     <div class="extra"><span>Coco queimado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Coco queimado" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha de caju</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha de caju" data-extra="6.00"></div>
+     <div class="extra"><span>Castanha do pará</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,00</span><input type="hidden" value="Castanha do pará" data-extra="6.00"></div>
+     <div class="extra"><span>Kiwi</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$5,00</span><input type="hidden" value="Kiwi" data-extra="5.00"></div>
+  </div>
+
+</div>
+
+      </div>
+    </section>
+<section id="smoothies">
+      <h2>Smoothies (400ml)</h2>
+      <div class="grid-produtos">
+        
+        <div class="item" data-name="Smoothie Clássico" data-price="22.50" data-desc="Açaí especial batido com banana e leite integral." data-img="img/sm-classico.jpg">
+          <img src="img/sm-classico.jpg" alt="Clássico">
+          <div class="item-info">
+            <h3>Clássico</h3>
+            <span>R$ 22,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Protein" data-price="28.50" data-desc="Açaí especial batido com banana e whey protein de baunilha." data-img="img/sm-protein.jpg">
+          <img src="img/sm-protein.jpg" alt="Protein">
+          <div class="item-info">
+            <h3>Protein</h3>
+            <span>R$ 28,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Vitality" data-price="27.50" data-desc="Açaí especial batido com banana, cacau em pó, café, coco e canela." data-img="img/sm-vitality.jpg">
+          <img src="img/sm-vitality.jpg" alt="Vitality">
+          <div class="item-info">
+            <h3>Vitality</h3>
+            <span>R$ 27,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Fresh" data-price="22.50" data-desc="Açaí especial batido com Morango, abacaxi e hortelã." data-img="img/sm-fresh.jpg">
+          <img src="img/sm-fresh.jpg" alt="Fresh">
+          <div class="item-info">
+            <h3>Fresh</h3>
+            <span>R$ 22,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Pulse" data-price="23.50" data-desc="Açaí especial batido com banana, pasta de amendoim e paçoca." data-img="img/sm-pulse.jpg">
+          <img src="img/sm-pulse.jpg" alt="Pulse">
+          <div class="item-info">
+            <h3>Pulse</h3>
+            <span>R$ 23,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Energy" data-price="24.50" data-desc="Açaí especial batido com banana, morango e paçoca." data-img="img/sm-energy.jpg">
+          <img src="img/sm-energy.jpg" alt="Energy">
+          <div class="item-info">
+            <h3>Energy</h3>
+            <span>R$ 24,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Sunset" data-price="28.50" data-desc="Cupuaçu batido com morango, whey e hortelã." data-img="img/sm-sunset.jpg">
+          <img src="img/sm-sunset.jpg" alt="Sunset">
+          <div class="item-info">
+            <h3>Sunset</h3>
+            <span>R$ 28,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Vibes" data-price="23.50" data-desc="Cupuaçu batido com banana, morango e pasta de amendoim." data-img="img/sm-vibes.jpg">
+          <img src="img/sm-vibes.jpg" alt="Vibes">
+          <div class="item-info">
+            <h3>Vibes</h3>
+            <span>R$ 23,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Tropical" data-price="21.50" data-desc="Açaí especial batido com uva, abacaxi e hortelã." data-img="img/sm-tropical.jpg">
+          <img src="img/sm-tropical.jpg" alt="Tropical">
+          <div class="item-info">
+            <h3>Tropical</h3>
+            <span>R$ 21,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Smoothie Power" data-price="29.50" data-desc="Açaí especial batido com banana, pasta de amendoim, whey de baunilha e paçoca." data-img="img/sm-power.jpg">
+          <img src="img/sm-power.jpg" alt="Power">
+          <div class="item-info">
+            <h3>Power</h3>
+            <span>R$ 29,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+      </div>
+    </section>
+
+    <section id="leve-pra-casa">
+      <h2>Leve pra Casa</h2>
+      <div class="grid-produtos">
+        
+        <div class="item" data-name="Açaí no pote 1,5L" data-price="41.50" data-desc="1,2 kg de açaí." data-img="img/pote15.jpg">
+          <img src="img/pote15.jpg" alt="Pote 1.5L">
+          <div class="item-info">
+            <h3>Açaí no pote 1,5L</h3>
+            <span>R$ 41,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Açaí Nuts no pote 1,5L" data-price="46.50" data-desc="1,2 kg de açaí nuts." data-img="img/potenuts.jpg">
+          <img src="img/potenuts.jpg" alt="Pote Nuts">
+          <div class="item-info">
+            <h3>Açaí Nuts no pote 1,5L</h3>
+            <span>R$ 46,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Picolé Açaí-se Nuts" data-price="11.50" data-desc="60g." data-img="img/picole.jpg">
+          <img src="img/picole.jpg" alt="Picolé">
+          <div class="item-info">
+            <h3>Picolé Nuts</h3>
+            <span>R$ 11,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Polpinha (4x100g)" data-price="21.50" data-img="img/polpa4.jpg">
+          <img src="img/polpa4.jpg" alt="Polpinha 4un">
+          <div class="item-info">
+            <h3>Polpinha (4un)</h3>
+            <span>R$ 21,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+        <div class="item" data-name="Polpinha (10x100g)" data-price="45.50" data-img="img/polpa10.jpg">
+          <img src="img/polpa10.jpg" alt="Polpinha 10un">
+          <div class="item-info">
+            <h3>Polpinha (10un)</h3>
+            <span>R$ 45,50</span>
+            <button class="ver-detalhes">Adicionar</button>
+          </div>
+          </div>
+
+      </div>
+    </section>
+
+<section id="monte-sua-salada">
+  <h2>Monte sua Salada</h2>
+  <div class="grid-produtos">
+
+    <div class="item" data-name="Monte sua Salada" data-price="44.90" data-desc="Monte sua salada com mix de folhas + 3 acompanhamentos e 1 fonte de proteína." data-img="img/salada-monte.jpg">
+      
+      <img src="img/salada-monte.jpg" alt="Monte sua Salada">
+      
+      <div class="item-info">
+        <h3>🥗 Monte sua Salada</h3>
+        <span>R$ 44,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         
+         <h4 class="titulo-opcao">🥩 Escolha 1 Proteína (Inclusa)</h4>
+         <label class="radio-opcao"><input type="radio" name="salada_proteina_free" checked data-extra="0" value="Frango desfiado"><span>Frango desfiado</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_proteina_free" data-extra="0" value="Frango grelhado"><span>Frango grelhado</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_proteina_free" data-extra="0" value="Contra filé"><span>Contra filé</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_proteina_free" data-extra="0" value="Camarão"><span>Camarão</span></label>
+
+         <h4 class="titulo-opcao">🥕 Escolha 3 Toppings (Inclusos)</h4>
+         <div class="free-topping-group" data-limit="3"> 
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Tomate cereja"><span>Tomate cereja</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Cenoura ralada"><span>Cenoura ralada</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Queijo parmesão"><span>Queijo parmesão</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Pepino"><span>Pepino</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Milho"><span>Milho</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Gergelim"><span>Gergelim</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Manga"><span>Manga</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Farofa de bacon"><span>Farofa de bacon</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Abacaxi grelhado"><span>Abacaxi grelhado</span></label>
+             <label class="opcao-item"><input type="checkbox" class="free-check" data-extra="0" value="Chips de batata doce"><span>Chips de batata doce</span></label>
+         </div>
+
+         <h4 class="titulo-opcao">🧂 Escolha 1 Molho (Incluso)</h4>
+         <label class="radio-opcao"><input type="radio" name="salada_molho_free" checked data-extra="0" value="Mostarda e mel"><span>Mostarda e mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_molho_free" data-extra="0" value="Barbecue"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_molho_free" data-extra="0" value="Queijos"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="salada_molho_free" data-extra="0" value="Pesto"><span>Pesto</span></label>
+
+         <h4 class="titulo-opcao">➕ Adicionais Extras (Pagos)</h4>
+         
+         <div class="extra"><span>Proteína Extra: Frango desfiado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$6,90</span><input type="hidden" value="Extra: Frango desfiado" data-extra="6.90"></div>
+         <div class="extra"><span>Proteína Extra: Frango grelhado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$7,90</span><input type="hidden" value="Extra: Frango grelhado" data-extra="7.90"></div>
+         <div class="extra"><span>Proteína Extra: Contra filé</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$8,90</span><input type="hidden" value="Extra: Contra filé" data-extra="8.90"></div>
+         <div class="extra"><span>Proteína Extra: Camarão</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$9,90</span><input type="hidden" value="Extra: Camarão" data-extra="9.90"></div>
+
+         <h5 class="titulo-opcao-extra">➡️ Topping extra: R$3,90</h5>
+         <div class="extra"><span>Topping Extra: Tomate cereja</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Tomate cereja" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Cenoura ralada</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Cenoura ralada" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Queijo parmesão</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Queijo parmesão" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Pepino</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Pepino" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Milho</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Milho" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Gergelim</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Gergelim" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Manga</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Manga" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Farofa de bacon</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Farofa de bacon" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Abacaxi grelhado</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Abacaxi grelhado" data-extra="3.90"></div>
+         <div class="extra"><span>Topping Extra: Chips de batata doce</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$3,90</span><input type="hidden" value="Extra: Chips de batata doce" data-extra="3.90"></div>
+         
+         <h5 class="titulo-opcao-extra">➡️ Molho extra: R$2,90</h5>
+         <div class="extra"><span>Molho Extra: Mostarda e mel</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$2,90</span><input type="hidden" value="Extra: Mostarda e mel" data-extra="2.90"></div>
+         <div class="extra"><span>Molho Extra: Barbecue</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$2,90</span><input type="hidden" value="Extra: Barbecue" data-extra="2.90"></div>
+         <div class="extra"><span>Molho Extra: Queijos</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$2,90</span><input type="hidden" value="Extra: Queijos" data-extra="2.90"></div>
+         <div class="extra"><span>Molho Extra: Pesto</span><div class="qtd-control"><button class="menos">–</button><span class="qtd">0</span><button class="mais">+</button></div><span class="preco">+R$2,90</span><input type="hidden" value="Extra: Pesto" data-extra="2.90"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+    <section id="verde-se">
+  <h2>Verde-se</h2>
+  <div class="grid-produtos">
+
+    <div class="item" data-name="Chicken Green Salad" data-price="33.90" data-desc="Mix de folhas, frango desfiado, tomate cereja, cenoura ralada e penne." data-img="img/salada-chicken-green.jpg">
+      
+      <img src="img/salada-chicken-green.jpg" alt="Chicken Green Salad">
+      
+      <div class="item-info">
+        <h3>Chicken Green Salad</h3>
+        <span>R$ 33,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥗 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_cgreen" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgreen" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgreen" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgreen" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Chicken Grilled Salad" data-price="35.90" data-desc="Mix de folhas, frango grelhado, cenoura ralada, tomate cereja, farofa de bacon e parmesão." data-img="img/salada-chicken-grilled.jpg">
+      
+      <img src="img/salada-chicken-grilled.jpg" alt="Chicken Grilled Salad">
+      
+      <div class="item-info">
+        <h3>Chicken Grilled Salad</h3>
+        <span>R$ 35,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥗 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_cgrilled" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgrilled" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgrilled" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_cgrilled" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Tropical Shrimp" data-price="42.90" data-desc="Mix de folhas, camarão grelhado, manga, pepino, milho e gergelim." data-img="img/salada-shrimp.jpg">
+      
+      <img src="img/salada-shrimp.jpg" alt="Tropical Shrimp">
+      
+      <div class="item-info">
+        <h3>Tropical Shrimp</h3>
+        <span>R$ 42,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥗 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_shrimp" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_shrimp" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_shrimp" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_shrimp" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Steak Green Salad" data-price="42.90" data-desc="Mix de folhas, steak grelhado, abacaxi, cebola roxa e chips de batata doce." data-img="img/salada-steak.jpg">
+      
+      <img src="img/salada-steak.jpg" alt="Steak Green Salad">
+      
+      <div class="item-info">
+        <h3>Steak Green Salad</h3>
+        <span>R$ 42,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥗 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_steak" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_steak" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_steak" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_steak" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+    <section id="wrap-se">
+  <h2>Wrap-se</h2>
+  <div class="grid-produtos">
+
+    <div class="item" data-name="Chicken Garden Wrap" data-price="33.90" data-desc="Nosso delicioso wrap integral, frango desfiado, mix de folhas, cenoura e tomate, finalizado com parmesão ralado." data-img="img/wrap-chicken-garden.jpg">
+      
+      <img src="img/wrap-chicken-garden.jpg" alt="Chicken Garden Wrap">
+      
+      <div class="item-info">
+        <h3>Chicken Garden Wrap</h3>
+        <span>R$ 33,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🌯 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_wgarden" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgarden" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgarden" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgarden" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Chicken Grilled Wrap" data-price="35.90" data-desc="Nosso delicioso wrap integral, frango grelhado, mix de folhas, cenoura e tomate, finalizado com parmesão ralado." data-img="img/wrap-chicken-grilled.jpg">
+      
+      <img src="img/wrap-chicken-grilled.jpg" alt="Chicken Grilled Wrap">
+      
+      <div class="item-info">
+        <h3>Chicken Grilled Wrap</h3>
+        <span>R$ 35,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🌯 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_wgrilled" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgrilled" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgrilled" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wgrilled" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Steak Cheese Wrap" data-price="38.90" data-desc="Nosso delicioso wrap integral, contra filé grelhado, mix de folhas, cebola roxa e farofa de bacon, finalizado com parmesão ralado." data-img="img/wrap-steak-cheese.jpg">
+      
+      <img src="img/wrap-steak-cheese.jpg" alt="Steak Cheese Wrap">
+      
+      <div class="item-info">
+        <h3>Steak Cheese Wrap</h3>
+        <span>R$ 38,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🌯 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_wsteak" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wsteak" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wsteak" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_wsteak" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+    <section id="bread-se">
+  <h2>Bread-se</h2>
+  <div class="grid-produtos">
+
+    <div class="item" data-name="Chicken Bread" data-price="27.90" data-desc="Pão ciabatta integral, mix de folhas, frango grelhado, tomate e pasta de ricota." data-img="img/bread-chicken.jpg">
+      
+      <img src="img/bread-chicken.jpg" alt="Chicken Bread">
+      
+      <div class="item-info">
+        <h3>Chicken Bread</h3>
+        <span>R$ 27,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥪 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_bchicken" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bchicken" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bchicken" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bchicken" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Steak Tropical Bred" data-price="33.90" data-desc="Pão ciabatta integral, mix de folhas, contra filé grelhado, farofa de bacon, cebola roxa e pasta de gorgonzola." data-img="img/bread-steak.jpg">
+      
+      <img src="img/bread-steak.jpg" alt="Steak Tropical Bred">
+      
+      <div class="item-info">
+        <h3>Steak Tropical Bred</h3>
+        <span>R$ 33,90</span>
+        <button class="ver-detalhes">Montar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥪 Escolha 1 Molho (Grátis)</h4>
+         <label class="radio-opcao"><input type="radio" name="molho_bsteak" checked data-extra="0"><span>Mostarda e Mel</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bsteak" data-extra="0"><span>Barbecue</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bsteak" data-extra="0"><span>Queijos</span></label>
+         <label class="radio-opcao"><input type="radio" name="molho_bsteak" data-extra="0"><span>Pesto</span></label>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="bebidas">
+  <h2>Bebidas</h2>
+  <div class="grid-produtos">
+
+    <div class="item" data-name="Água sem gás 500ml" data-price="7.50" data-img="img/agua.jpg">
+      <img src="img/agua.jpg" alt="Água">
+      <div class="item-info">
+        <h3>Água s/ gás</h3>
+        <span>R$ 7,50</span>
+        <button class="ver-detalhes">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="item" data-name="Água com gás 500ml" data-price="7.50" data-img="img/aguagas.jpg">
+      <img src="img/aguagas.jpg" alt="Água com gás">
+      <div class="item-info">
+        <h3>Água c/ gás</h3>
+        <span>R$ 7,50</span>
+        <button class="ver-detalhes">Adicionar</button>
+      </div>
+    </div>
+    
+    <div class="item" data-name="Escolha seu Refrigerante 350ml" data-price="8.50" data-img="img/refri.jpg" data-desc="Refrigerantes de lata 350ml (Coca-Cola, Guaraná, etc.).">
+      <img src="img/refri.jpg" alt="Refrigerante">
+      <div class="item-info">
+        <h3>Escolha seu Refrigerante</h3>
+        <span>R$ 8,50</span>
+        <button class="ver-detalhes">Adicionar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🥤 Escolha o Sabor</h4>
+         <label class="radio-opcao"><input type="radio" name="refri_choice" checked data-extra="0" value="Coca-Cola"><span>Coca-Cola</span></label>
+         <label class="radio-opcao"><input type="radio" name="refri_choice" data-extra="0" value="Coca-Cola Zero"><span>Coca-Cola Zero</span></label>
+         <label class="radio-opcao"><input type="radio" name="refri_choice" data-extra="0" value="Guaraná Antarctica"><span>Guaraná Antarctica</span></label>
+         <label class="radio-opcao"><input type="radio" name="refri_choice" data-extra="0" value="Guaraná Antarctica Zero"><span>Guaraná Antarctica Zero</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Escolha seu Suco Natural 400ml" data-price="10.00" data-img="img/suco-natural.jpg" data-desc="Sucos 400ml, 100% natural.">
+      <img src="img/suco-natural.jpg" alt="Suco Natural">
+      <div class="item-info">
+        <h3>Escolha seu Suco Natural</h3>
+        <span>R$ 10,00</span>
+        <button class="ver-detalhes">Adicionar</button>
+      </div>
+      <div class="opcoes-produto">
+         <h4 class="titulo-opcao">🍹 Escolha o Sabor (400ml)</h4>
+         <label class="radio-opcao"><input type="radio" name="suco_choice" checked data-extra="0" value="Suco de Manga"><span>Manga</span></label>
+         <label class="radio-opcao"><input type="radio" name="suco_choice" data-extra="0" value="Suco de Uva"><span>Uva</span></label>
+         <label class="radio-opcao"><input type="radio" name="suco_choice" data-extra="0" value="Suco de Acerola"><span>Acerola</span></label>
+         <label class="radio-opcao"><input type="radio" name="suco_choice" data-extra="0" value="Suco de Cajá"><span>Cajá</span></label>
+         <label class="radio-opcao"><input type="radio" name="suco_choice" data-extra="0" value="Suco de Goiaba"><span>Goiaba</span></label>
+      </div>
+    </div>
+
+    <div class="item" data-name="Energético" data-price="14.50" data-img="img/energetico.jpg">
+      <img src="img/energetico.jpg" alt="Energético">
+      <div class="item-info">
+        <h3>Energético</h3>
+        <span>R$ 14,50</span>
+        <button class="ver-detalhes">Adicionar</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+    <div id="sacola" class="sacola">
+      <h3>🛒 Sua sacola:</h3>
+      <ul id="lista-sacola"></ul>
+      <p id="total-sacola"><strong>Total:</strong> R$ 0,00</p>
+      <button id="btn-revisar" class="btn-primario">🔎 Revisar pedido</button>
+    </div>
+
+    <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">✕</button>
+      
+      <div class="modal-body-scroll">
+          <img id="modalImg" src="" alt="" />
+          <h3 id="modalTitle">Título</h3>
+          <p id="modalDesc">Descrição</p>
+
+          <div id="modalOpcoes" class="modal-opcoes"></div>
+
+          <div class="observacoes">
+              <label class="modal-label" for="modalObs">Observação (opcional)</label>
+              <textarea id="modalObs" rows="1" placeholder="Ex.: Capricha no leite condensado!"></textarea>
+          </div>
+      </div>
+
+      <div class="modal-footer">
+          <div class="preco-flutuante-left">
+              <small>Total:</small>
+              <span id="modalFloatPrice">R$ 0,00</span>
+          </div>
+          <button id="modalAdd" class="btn-primario">
+              🛍️ Adicionar
+          </button>
+          <span id="modalPrice" style="display: none;">R$ 0,00</span>
+      </div>
+
+    </div>
+  </div>
+
+    <div id="revisao" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <button class="modal-close" id="revisaoClose">✕</button>
+        <h3>Revisar pedido</h3>
+        <ul id="revisaoLista" class="revisao-lista"></ul>
+
+        <div class="entrega">
+          <p style="margin-bottom: 8px"><strong>Opção de entrega:</strong></p>
+          <label class="toggle-btn">
+            <input type="radio" name="tipoEntrega" value="retirada" id="opcaoRetirada" />
+            Retirada no local
+          </label>
+          <label class="toggle-btn">
+            <input type="radio" name="tipoEntrega" value="entrega" checked />
+            Entrega
+          </label>
+
+          <div id="campoEndereco" style="margin-top: 10px">
+            <label for="endereco">Bairro</label>
+            <input id="endereco" type="text" placeholder="Digite seu bairro" autocomplete="off" />
+            <ul id="sugestoes"></ul>
+
+            <label for="rua" style="margin-top: 10px; display: block">Rua e Número</label>
+            <input id="rua" type="text" placeholder="Ex: Av. Boa Viagem, 500" style="width: 100%" />
+
+            <label for="complemento" style="margin-top: 10px; display: block">Complemento (Apto / Bloco / Casa)</label>
+            <input id="complemento" type="text" placeholder="Ex: Apto 404, Bloco 5" style="width: 100%" />
+
+            <button id="btnCalcularEntrega" class="btn-primario" type="button" onclick="abrirModalMapa()">
+              🚗 Confirmar Endereço no Mapa
+            </button>
+            
+            <div id="resultadoEntrega"></div>
+          </div>
+
+         <div id="infoRetirada" ...>
+   Endereço para retirada: <strong>R. do Futuro, 504 - Graças, Recife - PE</strong>
+</div>
+          <input id="taxa" type="number" value="0" readonly style="display: none" />
+        </div>
+
+        <div class="pagamento" style="margin-top: 16px">
+          <label><strong>Forma de pagamento</strong></label>
+          <div class="opcoes-pagamento" style="margin-top: 6px">
+            <label><input type="radio" name="pagamento" value="Cartão" checked /> Débito / Crédito</label><br />
+            <label><input type="radio" name="pagamento" value="Pix" /> Pix</label><br />
+            <label><input type="radio" name="pagamento" value="Dinheiro" /> Dinheiro</label>
+          </div>
+          <p id="resumoTroco" style="display: none; margin-top: 6px; color: #ccc; font-size: 14px;"></p>
+        </div>
+
+        <p class="totais" style="margin-top: 12px">
+          Subtotal: <span id="revSubtotal">R$ 0,00</span><br />
+          Entrega: <span id="revTaxa">R$ 0,00</span><br />
+          <strong>Total: <span id="revTotal">R$ 0,00</span></strong>
+        </p>
+
+        <div class="modal-actions">
+          <button id="revisaoConfirmar" class="btn-whats">✅ Confirmar Pedido</button>
+        </div>
+
+        <div id="popupTroco" aria-hidden="true">
+          <div class="popup-card">
+            <p>Informe o valor que possui em dinheiro:</p>
+            <input type="number" id="valorTroco" placeholder="Ex: 30.00" step="0.01" min="0" />
+            <button id="confirmarTroco" class="btn-primario">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="painelAdicionais" class="modal" aria-hidden="true">
+      <div class="modal-content" style="max-width: 400px">
+        <button class="modal-close" onclick="fecharPainelAdicionais()">✕</button>
+        <h3>Gerenciar Adicionais</h3>
+        <ul id="listaAdicionais" style="list-style: none; padding: 0"></ul>
+      </div>
+    </div>
+    
+    <div id="modal-nome" class="modal-nome-backdrop">
+      <div class="modal-nome-content">
+        <img src="img/acai-se.png" alt="Logo" style="width: 80px; margin-bottom: 10px" />
+        <h3>Seja bem-vindo!</h3>
+        <p>Qual seu primeiro nome?</p>
+        <input type="text" id="input-nome-cliente" placeholder="Digite seu nome..." />
+        <button id="btn-confirmar-nome" class="btn-primario">Confirmar</button>
+      </div>
+    </div>
+    
+    <div id="modal-sucesso" class="modal-nome-backdrop" style="z-index: 10001">
+      <div class="modal-nome-content">
+        <h3 style="color: #28a745">Pedido Realizado!</h3>
+        <p>Seu pedido foi enviado para a loja.</p>
+      </div>
+    </div>
+
+    <div id="map-modal-container" class="acai-modal-container">
+      <div class="acai-modal-content" style="max-width: 500px;">
+        <div class="acai-modal-header">
+          <h2>Confirme sua localização</h2>
+          <button id="btn-fechar-mapa" class="btn-fechar-modal">×</button>
+        </div>
+        <div class="acai-modal-body" style="padding: 0;">
+          <div id="map-leaflet" style="width: 100%; height: 400px; z-index: 1;"></div>
+          <div id="centro-mira-visual"></div>
+        </div>
+        <div class="acai-modal-footer">
+          <p style="font-size: 0.9em; color: #ccc; text-align: left; flex-grow: 1;">Arraste o pino até o local exato da entrega.</p>
+          <button id="btn-confirmar-pino" class="btn-primario">Confirmar Posição</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-flutuante" class="btn-flutuante hidden">🛒 <span id="count-itens">0</span> itens — <span id="valor-itens">R$ 0,00</span></button>
+    <button id="btnCarrinhoNovo" class="btn-carrinho-novo hidden">🛒 <span id="novoCount">0</span> itens — <span id="novoTotal">R$ 0,00</span></button>
+    <footer class="area-moderador">
+      <button id="btnModerador" class="btn-primario">🔐 Modo Moderador</button>
+      <button id="btnGerenciarAdicionais" class="btn-primario" style="display: none">⚙️ Gerenciar Adicionais</button>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="module" src="script.js?v=1.2"></script>
+    
+  </body>
+</html>
