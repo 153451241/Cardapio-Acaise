@@ -171,6 +171,11 @@ function atualizarCarrinhoNovo() {
   }
 }
 
+function aplicarLimiteInicial(limite) {
+    // console.warn("Função antiga chamada, ignorando...");
+    // A lógica real agora está dentro de configurarToppingsDinamicos
+}
+
 function atualizarSacola() {
   if (!listaSacola || !totalSacola) return;
   listaSacola.innerHTML = "";
