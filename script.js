@@ -316,30 +316,118 @@ function abrirModalProduto(el) {
         i.addEventListener("change", atualizarPrecoModal);
     });
 
-    // 🔥 LÓGICA DE LIMITE (AGORA DINÂMICA) 🔥
-    const freeGroup = clone.querySelector('.free-topping-group');
-    if (freeGroup) {
-        const freeChecks = freeGroup.querySelectorAll('.free-check');
-        // Pega o limite do HTML (data-limit="3") ou assume 4 (pro Blend-se)
-        const limite = parseInt(freeGroup.dataset.limit || 4); 
+// O CÓDIGO ANTERIOR À LÓGICA DE LIMITE DEVE VIR AQUI.
+// Assumindo que 'clone' é a div do item (<div class="item" ...>) no modal.
 
+// -------------------------------------------------------------
+// VARIÁVEIS DE ESCOPO
+// -------------------------------------------------------------
+
+const freeGroup = clone.querySelector('.free-topping-group');
+const freeChecks = freeGroup ? freeGroup.querySelectorAll('.free-check') : [];
+
+// Função para ler o limite ATUALIZADO (lê o atributo data-limit do HTML)
+const getLimite = () => {
+    return freeGroup ? parseInt(freeGroup.dataset.limit || 4) : 4; 
+};
+
+// ** FUNÇÃO CRÍTICA **: Aplica o limite. Aceita 'limiteForcado' para garantir o valor correto.
+const aplicarLimiteInicial = (limiteForcado) => {
+    if (!freeGroup) return;
+
+    // Se um limite forçado for passado (pelo Bloco 1), usa ele. Se não, lê o data-limit atual.
+    const limite = limiteForcado || getLimite(); 
+    const marcados = freeGroup.querySelectorAll('.free-check:checked').length;
+    
+    freeChecks.forEach(el => {
+        if (marcados >= limite && !el.checked) {
+            el.disabled = true;
+        } else {
+            el.disabled = false;
+        }
+    });
+};
+
+
+// -------------------------------------------------------------
+// BLOCO 1: LÓGICA DE TAMANHO PARA MUDAR O LIMITE (data-limit) E RESETAR
+// -------------------------------------------------------------
+
+const sizeRadios = clone.querySelectorAll(
+    'input[name="tamanho_artesanal"], input[name="tamanho_mel"], input[name="tamanho_cupuacai"]'
+);
+
+if (sizeRadios.length > 0 && freeGroup) {
+    
+    // Função para atualizar o data-limit, o título e, o mais importante, RESETAR os checks.
+    const atualizarLimiteEChecks = (event) => {
+        let novoLimite = 2; // Limite padrão
+        let tituloVisual = '🤩 Escolha até 2 Grátis (3 Para de 700ml)'; // Título padrão
+        
+        // Verifica o tamanho selecionado.
+        const tamanho = event.target.value; 
+
+        if (tamanho === "700ml") {
+            novoLimite = 3; // Limite sobe para 3
+            tituloVisual = '🤩 Escolha até 3 Grátis';
+        }
+        
+        // 1. ATUALIZA O ATRIBUTO data-limit
+        freeGroup.setAttribute('data-limit', novoLimite);
+        
+        // 2. CORREÇÃO DO BUG: Reseta todos os checkboxes
         freeChecks.forEach(chk => {
-            chk.addEventListener('change', () => {
-                const marcados = freeGroup.querySelectorAll('.free-check:checked').length;
-                
-                // Trava os desmarcados se o limite for atingido
-                if (marcados >= limite) {
-                    freeChecks.forEach(el => {
-                        if (!el.checked) el.disabled = true;
-                    });
-                } else {
-                    // Libera todos se estiver abaixo do limite
-                    freeChecks.forEach(el => el.disabled = false);
-                }
-                atualizarPrecoModal(); // Recalcula o preço (embora seja grátis, é boa prática)
-            });
+            chk.checked = false;
+            chk.disabled = false;
         });
+
+        // 3. ATUALIZA O TÍTULO VISUAL
+        const tituloH4 = freeGroup.previousElementSibling; 
+        if (tituloH4 && tituloH4.tagName === 'H4') {
+             tituloH4.textContent = tituloVisual;
+        }
+
+        // 4. CHAMA A FUNÇÃO DE LIMITE PASSANDO O VALOR DIRETO (GARANTIA DE 3)
+        // Isso garante que o limite de 3 seja aplicado imediatamente.
+        aplicarLimiteInicial(novoLimite); 
+        
+        atualizarPrecoModal(); 
+    };
+    
+    // Adiciona o listener de evento para os rádios de tamanho
+    sizeRadios.forEach(radio => {
+        radio.addEventListener('change', atualizarLimiteEChecks);
+    });
+
+    // Chama a função para o rádio checked inicial (300ml)
+    const initialRadio = clone.querySelector('input[name="tamanho_artesanal"]:checked');
+    if (initialRadio) {
+        // Simula o evento inicial para aplicar o limite de 2 ao abrir o modal
+        atualizarLimiteEChecks({target: initialRadio});
     }
+}
+
+
+// -------------------------------------------------------------
+// BLOCO 2: LÓGICA DE LIMITE (USANDO AS FUNÇÕES DO ESCOPO)
+// -------------------------------------------------------------
+
+if (freeGroup) {
+    
+    freeChecks.forEach(chk => {
+        chk.addEventListener('change', () => {
+            // No evento de mudança do checkbox, chamamos sem forçar, e ele lê o data-limit atual
+            // A lógica de trava/liberação é re-aplicada.
+            aplicarLimiteInicial(); 
+            atualizarPrecoModal(); 
+        });
+    });
+
+    // Se o Bloco 1 não foi chamado (ou para qualquer caso de fallback), chamamos aqui.
+    // Remover a chamada aqui pode causar erro se o Bloco 1 não rodar.
+    // aplicarLimiteInicial(); 
+
+}
 
     // Configura os botões de + e -
     clone.querySelectorAll(".qtd-control").forEach((ctrl) => {
@@ -1688,3 +1776,106 @@ function gerarCodigoPedido(nome) {
   
   return `${prefixo}-${sufixo}`;
 }
+
+
+/**
+ * Configura a lógica de Toppings Grátis dinâmicos baseada no tamanho do produto.
+ * * @param {string} containerSelector - Seletor CSS para o div.item específico (ex: '[data-name="Açaí Artesanal"]').
+ * @param {string} sizeInputName - O valor do atributo 'name' dos radio buttons de tamanho (ex: 'tamanho_artesanal').
+ * @param {string} freeSpanId - O ID do span que mostra o limite de toppings grátis (ex: 'max-free-toppings_artesanal').
+ * @param {number} max700ml - O limite de toppings grátis quando o tamanho '700ml' é selecionado.
+ */
+function configurarToppingsDinamicos(containerSelector, sizeInputName, freeSpanId, max700ml) {
+    // 1. Busca os elementos DENTRO do container específico
+    const itemContainer = document.querySelector(containerSelector);
+    if (!itemContainer) return;
+
+    const sizeRadios = itemContainer.querySelectorAll(`input[name="${sizeInputName}"]`);
+    const maxFreeSpan = itemContainer.querySelector(`#${freeSpanId}`);
+    const freeToppingGroup = itemContainer.querySelector('.free-topping-group');
+    const freeCheckboxes = itemContainer.querySelectorAll('.free-check');
+    
+    // Define o limite padrão para 300ml e 500ml
+    const maxPadrao = 2; 
+
+    // 2. Função principal de atualização (lógica de limite e reset)
+    function atualizarToppings(event) {
+        let maxToppings = maxPadrao; 
+        
+        // Determina o tamanho selecionado (considera o padrão se nada estiver checked na inicialização)
+        const checkedSizeRadio = itemContainer.querySelector(`input[name="${sizeInputName}"]:checked`);
+        const tamanhoSelecionado = checkedSizeRadio ? checkedSizeRadio.value : '300ml';
+
+        // Lógica para determinar o limite: se for 700ml, usa o limite fornecido (max700ml)
+        if (tamanhoSelecionado === "700ml") {
+            maxToppings = max700ml;
+        }
+
+        // --- CORREÇÃO DO BUG (DESMARCAR e HABILITAR ao trocar o tamanho) ---
+        // Se o evento foi um 'change' e o alvo é um rádio de tamanho, reseta os checkboxes.
+        if (event && event.type === 'change' && event.target.name === sizeInputName) {
+            freeCheckboxes.forEach(checkbox => {
+                checkbox.checked = false; 
+            });
+        }
+        // -------------------------------------------------------------------
+        
+        // Atualiza o texto e o atributo de controle para a lógica de limite visual
+        if (maxFreeSpan) {
+            maxFreeSpan.textContent = maxToppings;
+        }
+        if (freeToppingGroup) {
+            freeToppingGroup.setAttribute('data-max-free', maxToppings);
+        }
+
+        // Lógica de desabilitar/habilitar checkboxes ao atingir o limite
+        const checkedCount = itemContainer.querySelectorAll('.free-check:checked').length;
+        
+        freeCheckboxes.forEach(checkbox => {
+            // Se a contagem atingiu o limite E este checkbox NÃO está marcado, ele é desabilitado.
+            if (checkedCount >= maxToppings && !checkbox.checked) {
+                checkbox.disabled = true; 
+            } else {
+                checkbox.disabled = false; // Caso contrário, fica habilitado.
+            }
+        });
+    }
+
+    // 3. Adiciona event listeners para RÁDIOS (mudar o limite e resetar)
+    sizeRadios.forEach(radio => {
+        radio.addEventListener('change', atualizarToppings);
+    });
+    
+    // 4. Adiciona event listeners para CHECKBOXES (para controlar o limite de marcação)
+    freeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', atualizarToppings);
+    });
+
+    // 5. Executa a função na inicialização para definir o estado inicial (2 Grátis)
+    // O timeout é opcional, mas garante que o DOM esteja completamente pronto, se necessário.
+    setTimeout(() => {
+        atualizarToppings({type: 'initial'}); 
+    }, 0);
+}
+
+// =========================================================================
+// CHAMADAS PARA OS PRODUTOS
+// =========================================================================
+
+// 1. AÇAÍ ARTESANAL: Limite de 2 grátis (300/500ml) ou 3 grátis (700ml)
+configurarToppingsDinamicos(
+    '[data-name="Açaí Artesanal"]',      // Seletor do container
+    'tamanho_artesanal',                // Nome do radio group
+    'max-free-toppings_artesanal',      // ID do span
+    3                                   // Limite quando 700ml é selecionado
+);
+
+// 2. BLEND-SE: Limite FIXO de 4 grátis (Para este exemplo, o limite é 4, independente do tamanho)
+// Se o Blend-se tiver apenas 2 tamanhos e for sempre 4 grátis, basta passar 4 como o 'max700ml'.
+configurarToppingsDinamicos(
+    '[data-name="Blend-se"]',          // Seletor do container
+    'tamanho_blend',                   // Nome do radio group
+    'max-free-toppings_blend',         // ID do span
+    4                                  // Limite quando 700ml/maior for selecionado (ou o limite fixo)
+);
+// Adicione outras chamadas para outros itens aqui...
