@@ -1243,11 +1243,7 @@ function confirmarPosicaoPino() {
   // 2. Cálculo da Taxa
   // Math.ceil arredonda para cima (ex: 1.1 vira 2, 2.1 vira 3)
   // Multiplica por 1.00 (valor por km)
-  let taxa = Math.ceil(distanciaKm) * 1.00;
-
-  // Garante que o mínimo seja R$ 1,00
-  if (taxa < 1) taxa = 1.00;
-
+let taxa = 5.0;
   // ==============================================
 
   inputTaxa.value = taxa.toFixed(2);
